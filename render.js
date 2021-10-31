@@ -26,3 +26,16 @@ function addTask(){
     ipcRenderer.invoke('show-notification', newTask.value);
     newTask.value = '';
 }
+
+function deleteTask(){
+
+}
+
+ipcRenderer.on('store-data', (event, todos)=>{
+
+  for (let value of Object.values(todos)) {
+    // Inserting task directly to UI
+    list.insertAdjacentHTML('beforeend', `<li class="list-group-item">${value}</li>`)  
+  }
+  
+});

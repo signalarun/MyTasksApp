@@ -6,6 +6,8 @@
 */
 const { app, BrowserWindow, ipcMain, Notification } = require('electron')
 const path = require('path')
+const Store = require('electron-store')
+const store = new Store();
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -20,10 +22,16 @@ function createWindow() {
   })
   win.setMenuBarVisibility(false)
   win.loadFile('main.html')
+
+  
+
+  win.webContents.on('did-finish-load', ()=>{
+    win.webContents.send('store-data', store.store);
+  })
+  //console.log(store.store);
 }
 
 app.whenReady().then(() => {
-
   createWindow()
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -41,7 +49,16 @@ ipcMain.handle('show-notification', (event, ...args) => {
   const notification = {
     title: 'New Task',
     body: `Added: ${args[0]}`
-  }
+  };
 
-  new Notification(notification).show()
+  new Notification(notification).show();
+
+// Saving the items
+  store.set(args[0], args[0]);
+  
+});
+
+ipcMain.handle('item-delete', (event, ...args) => {
+  // Saving the items
+  store.delete(args[0]);
 });
